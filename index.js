@@ -24,16 +24,59 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// Endpoint for date string or Unix timestamp
+app.get("/api/:date(\\d{4}-\\d{2}-\\d{2})", (req, res) => {
+  let dateInput = req.params.date;
+  // console.log(dateInput);
 
-// endpoints for Dec 25 
-app.get("/api/2015-12-25", (req,res) => {
-  res.send({"unix":1451001600000, "utc":"Fri, 25 Dec 2015 00:00:00 GMT"});
-})
+  // If the date parameter is empty, use the current date
+  if (!dateInput) {
+    dateObject = new Date();
+  } else {
+    // Try to parse the input as a number (Unix timestamp)
+    const timestamp = parseInt(dateInput);
+    // console.log("Timestamp parse:" + timestamp)
+    if (isNaN(timestamp)) {
+      dateObject = new Date(timestamp);
+    } else {
+      // Try to parse the input as a date string
+      dateObject = new Date(dateInput);
+    }
+  }
 
-// endpoints for /api/1451001600000
-app.get("/api/1451001600000", (req,res) => {
-  res.send({"unix":1451001600000, "utc":"Fri, 25 Dec 2015 00:00:00 GMT"});
-})
+  // Check if the date is valid
+  if (isNaN(dateObject.getTime())) {
+    return res.send({ error: "Invalid Date" });
+  }
+
+  // Get the Unix timestamp in milliseconds
+  const timestampMilliseconds = dateObject.getTime();
+  // console.log("Time Stamp: " + timestampMilliseconds);
+
+  // Get the formatted date string
+  const formattedDate = dateObject.toUTCString();
+  // console.log("Date: " + formattedDate);
+
+  res.send({ "unix": timestampMilliseconds, "utc": formattedDate });
+});
+
+// Endpoint for Unix timestamp in milliseconds
+app.get("/api/:timestampMilliseconds", (req, res) => {
+  let timestampInput = req.params.timestampMilliseconds;
+
+  // Parse the input as an integer
+  const timestamp = parseInt(timestampInput, 10);
+  const dateObject = new Date(timestamp);
+  
+  // Check if the date is valid
+  if (isNaN(dateObject.getTime())) {
+    return res.send({ error: "Invalid Date with timestamp" });
+  }
+
+  // Get the formatted date string
+  const formattedDate = dateObject.toUTCString();
+  res.send({ "unix": timestamp, "utc": formattedDate });
+});
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
