@@ -27,16 +27,17 @@ app.get("/api/hello", function (req, res) {
 // Endpoint for date string or Unix timestamp
 app.get("/api/:date(\\d{4}-\\d{2}-\\d{2})", (req, res) => {
   let dateInput = req.params.date;
+  let dateObject;
   // console.log(dateInput);
 
   // If the date parameter is empty, use the current date
-  if (!dateInput) {
+  if (dateInput === "") {
     dateObject = new Date();
   } else {
     // Try to parse the input as a number (Unix timestamp)
     const timestamp = parseInt(dateInput);
     // console.log("Timestamp parse:" + timestamp)
-    if (isNaN(timestamp)) {
+    if (isNaN(timestamp) && dateInput.length !== timestamp.toString().length) {
       dateObject = new Date(timestamp);
     } else {
       // Try to parse the input as a date string
