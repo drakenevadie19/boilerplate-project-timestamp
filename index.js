@@ -70,7 +70,7 @@ app.get("/api/:timestampMilliseconds", (req, res) => {
   
   // Check if the date is valid
   if (isNaN(dateObject.getTime())) {
-    return res.send({ error: "Invalid Date with timestamp" });
+    return res.send({ error: "Invalid Date" });
   }
 
   // Get the formatted date string
